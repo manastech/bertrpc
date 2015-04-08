@@ -1,12 +1,13 @@
 module BERTRPC
   class Service
-    attr_accessor :host, :port, :timeout, :connect_timeout
+    attr_accessor :host, :port, :timeout, :connect_timeout, :ssl
 
-    def initialize(host, port, timeout = nil, connect_timeout = nil)
+    def initialize(host, port, options = {})
       @host = host
       @port = port
-      @timeout = timeout
-      @connect_timeout = connect_timeout
+      @timeout = options[:timeout]
+      @connect_timeout = options[:connect_timeout]
+      @ssl = options[:ssl]
     end
 
     def call(options = nil)

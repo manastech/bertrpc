@@ -28,7 +28,7 @@ module BERTRPC
       while size < len
         r, w, e = IO.select([sock], [], [], timeout)
         raise Errno::EAGAIN if r.nil?
-        msg, sender = sock.recvfrom(len - size)
+        msg = sock.read(len - size)
         raise Errno::ECONNRESET if msg.size == 0
         size += msg.size
         data << msg
@@ -38,7 +38,7 @@ module BERTRPC
 
     def transaction(bert_request)
       timeout = @svc.timeout && Float(@svc.timeout)
-      sock = connect_to(@svc.host, @svc.port, @svc.connect_timeout)
+      sock = connect_to(@svc.host, @svc.port, @svc.connect_timeout, @svc.ssl)
       if @req.options
         if @req.options[:cache] && @req.options[:cache][0] == :validation
           token = @req.options[:cache][1]
@@ -71,7 +71,7 @@ module BERTRPC
     #   +host+ String address of the target TCP server
     #   +port+ Integer port of the target TCP server
     #   +timeout+ Optional Integer (in seconds) of the read timeout
-    def connect_to(host, port, timeout = nil)
+    def connect_to(host, port, timeout = nil, ssl = false)
       timeout = timeout && Float(timeout)
       addr = Socket.getaddrinfo(host, nil, Socket::AF_INET)
       sock = Socket.new(Socket.const_get(addr[0][0]), Socket::SOCK_STREAM, 0)
@@ -98,6 +98,11 @@ module BERTRPC
         end
       else
         sock.connect(Socket.pack_sockaddr_in(port, addr[0][3]))
+      end
+
+      if ssl
+        sock = OpenSSL::SSL::SSLSocket.new(sock)
+        sock.connect
       end
 
       sock

@@ -17,6 +17,10 @@ BERTRPC was developed for GitHub and is currently in production use performing
 millions of RPC requests every day. The stability and performance have been
 exemplary.
 
+Changes to the original
+-----------------------
+
+* Adds support for SSL. Check the Documentation section.
 
 Installation
 ------------
@@ -60,9 +64,12 @@ Creating a service:
 
     # No timeout
     svc = BERTRPC::Service.new('localhost', 9999)
-    
+
     # 10s socket read timeout, raises BERTRPC::ReadTimeoutError
-    svc = BERTRPC::Service.new('localhost', 9999, 10)
+    svc = BERTRPC::Service.new('localhost', 9999, timeout: 10)
+
+    # SSL
+    svc = BERTRPC::Service.new('localhost', 9999, ssl: true)
 
 
 Copyright

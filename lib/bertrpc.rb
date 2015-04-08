@@ -1,5 +1,6 @@
 require 'bert'
 require 'socket'
+require 'openssl'
 require 'net/protocol'
 
 require 'bertrpc/service'
